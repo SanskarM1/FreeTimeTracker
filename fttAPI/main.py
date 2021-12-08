@@ -1,8 +1,10 @@
 # Flask helps build API - allows website to access database
 from flask import Flask, request, jsonify
+import pprint
+import sqlite3
 
 app = Flask(__name__)
-
+connection = sqlite3.connect('database.db')
 
 @app.route("/", methods=["GET"])
 def hello_world():
@@ -43,6 +45,37 @@ def post():
 
     return "SUCCESS: USER CREATED"
 
+@app.route("/inputdata", methods=["POST"])
+def input_data():
+    body = request.json
+    if body is None:
+        return "Error: NO DATA PROVIDED"
+    categories = body.get("categories", None)
+    pprint.pprint(categories)
+    for category in categories.keys():
+        print(category, categories.get(category))
+    # entertainment = body.get("entertainment", None)
+    # physicalactivity = body.get("physical activity", None)
+    # productivity = body.get("Productivity", None)
+
+    # if entertainment is None or physicalactivity is None or productivity is None:
+    #     return "ERROR: INCOMPLETE DATA"
+
+    #TODO Add information to database
+
+    return "SUCCESS: INFORMATION ADDED"
+
+
+
+@app.route("/getdata", methods = ["GET"])
+def get_data():
+
+    #Todo GET INFO FROM DATABASE
+
+    #Transformation step --> translate info from database to API
+
+    #return transform data
+    pass
 
 
 if __name__ == '__main__':
