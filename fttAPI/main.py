@@ -4,31 +4,82 @@ import pprint
 import sqlite3
 
 app = Flask(__name__)
-connection = sqlite3.connect('database.db')
-
-@app.route("/", methods=["GET"])
-def hello_world():
-    return "bye World"
 
 
-@app.route("/query", methods=["GET"])
-def query():
-    number = request.args.get("number")
-    return number + "1"
+#Opens the database as a SQLite connection , creates it if it doesnt exist
+connection = sqlite3.connect('database.db', check_same_thread=False)
 
 
-@app.route("/somethining", methods=["GET"])
-def somethining():
+#TODO Create Table!! + error handling
+
+try:
+    connection.execute('''
+    CREATE TABLE logged_hours(
+        Username varchar(255),
+        Categories varchar(255),
+        Hours float
+    );    
+    ''')
+except sqlite3.Error as e:
+    print(f'Failed to create table, Error: {e}')
+
+@app.route("/inputdata", methods=["POST"])
+def log_hours():
     body = request.json
     if body is None:
-        return "No json provided"
-    number = body.get("num", 0)
-    text = body.get("text", "no text provided")
-    value = {
-        "newtext": text + text,
-        "newnumber": number + 5
-    }
-    return jsonify(value)
+        return "Error: NO DATA PROVIDED"
+
+    username = body.get("username", None)
+    categories = body.get("categories", None)
+    #pprint.pprint(categories)
+    for category in categories.keys():
+        print(category, categories.get(category))
+
+    #TODO Add information to database
+
+    for category in categories.keys():
+        connection.execute(f'''
+        INSERT INTO logged_hours (Username, Categories, Hours)
+        VALUES ("{username}", "{category}", {categories.get(category)});
+        ''')
+
+    #connection.execute(f'''
+    #INSERT INTO logged_hours (Categories, Hours)
+    #VALUES ("entertainment", {5});
+    #''')
+    connection.commit()
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM logged_hours;")
+    rows = cursor.fetchall()
+    for row in rows:
+        print(row)
+
+    return "SUCCESS: INFORMATION ADDED"
+
+
+
+
+@app.route('/getdata/<username>', methods = ["GET"])
+def get_data(username):
+
+    #Todo GET INFO FROM DATABASE
+    #Have a way for user to enter in username info and get information for specific user
+    returninfo = connection.cursor()
+    returninfo.execute("SELECT * FROM logged_hours;")
+    rows = returninfo.fetchall()
+    for row in rows:
+        if row[2] == (username):
+            print(row)
+
+    #Transformation step --> translate info from database to API
+
+    #return transform data
+    return "INFORMATION RETURNED"
+
+#TODO ADD METHOD TO CLEAR ALL DATA IN DATABASE
+
+if __name__ == '__main__':
+    app.run(host="127.0.0.1", port=8080)
 
 @app.route("/createuser", methods=["POST"])
 def post():
@@ -44,39 +95,3 @@ def post():
     #TODO Create user in database
 
     return "SUCCESS: USER CREATED"
-
-@app.route("/inputdata", methods=["POST"])
-def input_data():
-    body = request.json
-    if body is None:
-        return "Error: NO DATA PROVIDED"
-    categories = body.get("categories", None)
-    pprint.pprint(categories)
-    for category in categories.keys():
-        print(category, categories.get(category))
-    # entertainment = body.get("entertainment", None)
-    # physicalactivity = body.get("physical activity", None)
-    # productivity = body.get("Productivity", None)
-
-    # if entertainment is None or physicalactivity is None or productivity is None:
-    #     return "ERROR: INCOMPLETE DATA"
-
-    #TODO Add information to database
-
-    return "SUCCESS: INFORMATION ADDED"
-
-
-
-@app.route("/getdata", methods = ["GET"])
-def get_data():
-
-    #Todo GET INFO FROM DATABASE
-
-    #Transformation step --> translate info from database to API
-
-    #return transform data
-    pass
-
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=80)
