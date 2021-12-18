@@ -29,19 +29,28 @@ def log_hours():
     if body is None:
         return "Error: NO DATA PROVIDED"
 
+    print(body)
     username = body.get("username", None)
-    categories = body.get("categories", None)
+    category = body.get("category", None)
+    hours = body.get("hours", None)
+
+    #categories = body.get("categories", None)
     # pprint.pprint(categories)
-    for category in categories.keys():
-        print(category, categories.get(category))
+    #for category in categories.keys():
+        #print(category, categories.get(category))
 
     # TODO Add information to database
 
-    for category in categories.keys():
-        connection.execute(f'''
-        INSERT INTO logged_hours (Username, Categories, Hours)
-        VALUES ("{username}", "{category}", {categories.get(category)});
-        ''')
+    connection.execute(f'''
+    INSERT INTO logged_hours (Username, Categories, Hours)
+    VALUES ("{username}", "{category}", "{hours}")
+    ''')
+
+    #for category in categories.keys():
+        #connection.execute(f'''
+        #INSERT INTO logged_hours (Username, Categories, Hours)
+        #VALUES ("{username}", "{category}", {categories.get(category)});
+        #''')
 
     # connection.execute(f'''
     # INSERT INTO logged_hours (Categories, Hours)
@@ -57,8 +66,9 @@ def log_hours():
     return "SUCCESS: INFORMATION ADDED"
 
 
-@app.route('/getdata/<username>', methods=["GET"])
-def get_data(username):
+@app.route('/getdata', methods=["GET"])
+def get_data():
+    username = request.args.get('username')
     # Todo GET INFO FROM DATABASE
     # Have a way for user to enter in username info and get information for specific user
     returninfo = connection.cursor()
