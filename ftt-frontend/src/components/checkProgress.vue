@@ -1,35 +1,26 @@
 <template>
-  <h3>Check Log:</h3>
+  <h3>Check Progress:</h3>
 
   <form @submit.prevent="getdata">
     <label>Username:</label>
     <input type="username" required v-model="clientusername" />
+    <label>Category:</label>
+    <input type="text" required v-model="category" />
     <div class="submit">
-      <button>Get Log</button>
+      <button>Check</button>
     </div>
   </form>
-  <h3>Returned Data:</h3>
-  <table class="center">
-    <tr>
-      <th>Username</th>
-      <th>Category</th>
-      <th>Hours</th>
-    </tr>
-    <tr v-for="record in data" :key="record"> 
-      <td>{{record[0]}}</td>
-      <td>{{record[1]}}</td>
-      <td>{{record[2]}}</td>
-     
-    </tr>
-
-  </table>
+  <h3>Progress:</h3>
+  <h4>
+    {{data}}
+ </h4>
   <!-- <p>{{data}}</p> -->
 </template>
 
 <script>
 import axios from "axios";
 export default {
-  name: "returnInfo",
+  name: "checkProgress",
   mounted: async function () {
     this.getdata();
     console.log("Hello world");
@@ -37,20 +28,31 @@ export default {
   data() {
     return {
       clientusername: "",
-      data: [],
+      category: "",
+      data: "",
     };
   },
   methods: {
     getdata: async function () {
       try {
-        const response = await axios.get("http://127.0.0.1:8081/getdata", {
+        const response = await axios.get("http://127.0.0.1:8081/checkprogress", {
           params: {
             username: this.clientusername,
+            category: this.category
           },
         });
 
         console.log(response.data);
-        this.data = response.data;
+        if(response.data.difference < 0){
+            this.data = "You need " + Math.abs(response.data.difference) + " more hours to meet this goal!"
+        }
+        else if(response.data.difference == 0){
+            this.data = "You've met this goal! Good Job!"
+        }
+        else{
+            this.data = "You've exceeded this goal by " + Math.abs(response.data.difference) +  " Great Job!"
+        }
+        
       } catch (error) {
         console.log(error);
       }

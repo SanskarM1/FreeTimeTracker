@@ -1,7 +1,7 @@
 <template>
 
   
-  <h3>Log Hours:</h3>
+  <h3>Set Goals:</h3>
   
   <form @submit.prevent="submitDatabase">
       <label>Username:</label>
@@ -13,11 +13,8 @@
       <label>Hours:</label>
       <input type="number" required v-model="posts.hours">
 
-      <label>Date:</label>
-      <input type="date" required v-model="posts.date">
-
     <div class="submit">
-        <button>Log Information</button>
+        <button>Set a Goal</button>
     </div>
       
 
@@ -29,23 +26,23 @@
 <script>
 import axios from 'axios';
 export default {
-    name: 'enterInfo',
+    name: 'setGoals',
     data() {
         return {
             posts:{
                 username: "",
                 category : "",
                 hours: "",
-                date: ""  
+                 
             }
             
         }
     },
     methods: {
         submitDatabase: async function(){
-            console.log('form submitted');
+           console.log('goal submitted');
             console.log(this.posts.date)
-            await axios.post("http://127.0.0.1:8081/inputdata", this.posts);
+            await axios.post("http://127.0.0.1:8081/setgoals", this.posts);
                
         }
     }

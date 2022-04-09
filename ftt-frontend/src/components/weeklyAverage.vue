@@ -1,35 +1,35 @@
 <template>
-  <h3>Check Log:</h3>
+  <h3>Weekly Average:</h3>
 
   <form @submit.prevent="getdata">
     <label>Username:</label>
     <input type="username" required v-model="clientusername" />
     <div class="submit">
-      <button>Get Log</button>
+      <button>Get Average</button>
     </div>
   </form>
   <h3>Returned Data:</h3>
   <table class="center">
     <tr>
-      <th>Username</th>
       <th>Category</th>
       <th>Hours</th>
+    
     </tr>
     <tr v-for="record in data" :key="record"> 
       <td>{{record[0]}}</td>
       <td>{{record[1]}}</td>
-      <td>{{record[2]}}</td>
+      
      
     </tr>
 
   </table>
-  <!-- <p>{{data}}</p> -->
+  
 </template>
 
 <script>
 import axios from "axios";
 export default {
-  name: "returnInfo",
+  name: "weeklyAverage",
   mounted: async function () {
     this.getdata();
     console.log("Hello world");
@@ -43,7 +43,7 @@ export default {
   methods: {
     getdata: async function () {
       try {
-        const response = await axios.get("http://127.0.0.1:8081/getdata", {
+        const response = await axios.get("http://127.0.0.1:8081/weeklyaverage", { //http://127.0.0.1:8080/getdata
           params: {
             username: this.clientusername,
           },
